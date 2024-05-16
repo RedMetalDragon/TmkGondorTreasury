@@ -53,7 +53,7 @@ namespace TmkGondorTreasury.Api.Controllers
                     var paymentIntent = await _stripeRegistrationService.CreatePaymentIntent(paymentIntentDto);
                     return Ok(new { clientSecret = paymentIntent.ClientSecret });
                 }
-                catch (StripeException e)
+                catch (StripeException)
                 {
                     return BadRequest("Error in the payment flow. [$$-1]");
                 }
