@@ -19,6 +19,7 @@ if (app.Environment.IsDevelopment())
     // app.UseSwaggerUI();
 }
 app.UseSession();
+app.UseCors();
 app.UseRouting();
 app.UseHttpsRedirection();
 app.MapControllers();
