@@ -29,7 +29,7 @@ namespace TmkGondorTreasury.Config
             });
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); // Add HttpContextAccessor
             services.AddScoped<SessionStorageService>();
-            services.AddScoped<StripeRegistrationService>(sp => new StripeRegistrationService(configuration["Stripe:SecretKey"] ?? "Secret Stripe Key not provided", configuration));
+            services.AddScoped<StripeRegistrationService>(sp => new StripeRegistrationService(configuration["Stripe:ApiKey"] ?? "Secret Stripe Key not provided", configuration));
         }
         public static void ConfigureApp(this WebApplication webApplication)
         {

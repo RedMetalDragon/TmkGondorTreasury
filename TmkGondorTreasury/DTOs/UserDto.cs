@@ -11,6 +11,6 @@ public record UserDto
 
     public bool? AgreeOnTerms { get; init; }
 
-    public string? SubsriptionPlan { get; init; }
+    public string? SubscriptionPlan { get; init; }
 
 }

@@ -7,6 +7,8 @@ public record PaymentIntentDto
 {
     public string? CustomerId { get; init; }
 
+    public string? PaymentMethodId { get; init; }
+
     public UserDto? UserDto { get; init; }
 
     public SubscriptionPlan SubscriptionPlan { get; init; }

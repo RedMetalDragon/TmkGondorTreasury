@@ -46,21 +46,8 @@ namespace TmkGondorTreasury.Api.Controllers
                     return BadRequest("User data is missing.");
                 }
                 await _sessionStorageService.SaveUser(userDto);
-                var customer = await _stripeRegistrationService.CreateCustomer(userDto);
-                var paymentIntent = await _stripeRegistrationService.CreatePaymentIntentForSubscription(new PaymentIntentDto
-                {
-                    CustomerId = customer.Id,
-                    UserDto = userDto,
-                    SubscriptionPlan = userDto.SubsriptionPlan switch
-                    {
-                        "standard" => DTOs.Enums.SubscriptionPlan.Standard,
-                        "basic" => DTOs.Enums.SubscriptionPlan.Basic,
-                        "premiun" => DTOs.Enums.SubscriptionPlan.Premium,
-                        _ => throw new NotImplementedException(),
-                    }
-
-                });
-                return Ok(new { paymentIntent.ClientSecret });
+                var setupIntent = await _stripeRegistrationService.CreateCustomerAndSetupIntent(userDto);
+                return Ok(new { setupIntent.CustomerId, setupIntent.IntentClientSecret });
             }
             catch (NotImplementedException)
             {
@@ -70,6 +57,33 @@ namespace TmkGondorTreasury.Api.Controllers
             {
                 return BadRequest("Error retrieving temporary user. [$$-2]");
             }
+        }
+
+        // POST: api/users/register-new-user/attach-payment-method
+        [HttpPost("register-new-user/attach-payment-method")]
+        public async Task<IActionResult> AttachPaymentMethod([FromBody] PaymentIntentDto paymentIntentDto)
+        {
+            try
+            {
+                var subscription = await _stripeRegistrationService.AttachPaymentMethodAndCreateSubscription
+                    (
+                        paymentIntentDto.CustomerId ?? throw new ArgumentNullException("Customer ID is missing."),
+                        paymentIntentDto.PaymentMethodId ?? throw new ArgumentNullException("Payment Method ID is missing."),
+                        paymentIntentDto.SubscriptionPlan
+                    );
+
+                return Ok(new { succss = true, subscriptionId = subscription.Id });
+
+            }
+            catch (ArgumentNullException e)
+            {
+                return BadRequest(e.Message);
+            }
+            catch (Exception)
+            {
+                return BadRequest("Error attaching payment method. Unknown error [$$-7]");
+            }
+
         }
     }
 }
