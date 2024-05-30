@@ -116,7 +116,6 @@ public class StripeRegistrationService
                 Customer = customer.Id,
                 Amount = price.UnitAmount,
                 Currency = "usd", // Set your currency
-                PaymentMethodTypes = new List<string> { "card", "apple_pay", "amazon_pay", "paypal" },
                 AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions { Enabled = true },
             };
             var paymentIntent = await paymentIntentService.CreateAsync(paymentIntentOptions);

@@ -12,9 +12,10 @@ namespace TmkGondorTreasury.Config
             {
                 options.Cookie.Name = ".TmkGondorTreasury.Session";
                 options.Cookie.HttpOnly = true;
-                options.IdleTimeout = TimeSpan.FromSeconds(120);
+                options.IdleTimeout = TimeSpan.FromMinutes(5);
                 options.Cookie.IsEssential = true;
             });
+            services.AddHttpContextAccessor();
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
@@ -27,7 +28,6 @@ namespace TmkGondorTreasury.Config
                             ;
                     });
             });
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); // Add HttpContextAccessor
             services.AddScoped<SessionStorageService>();
             services.AddScoped<StripeRegistrationService>(sp => new StripeRegistrationService(configuration["Stripe:ApiKey"] ?? "Secret Stripe Key not provided", configuration));
         }

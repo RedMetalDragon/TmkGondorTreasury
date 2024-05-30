@@ -18,9 +18,9 @@ if (app.Environment.IsDevelopment())
     // app.UseSwagger();
     // app.UseSwaggerUI();
 }
-app.UseSession();
 app.UseCors();
 app.UseRouting();
+app.UseSession();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
