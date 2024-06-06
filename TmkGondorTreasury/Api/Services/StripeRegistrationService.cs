@@ -1,4 +1,6 @@
 ﻿namespace TmkGondorTreasury.Services;
+
+using Microsoft.AspNetCore.Http.HttpResults;
 using Stripe;
 using TmkGondorTreasury.DTOs;
 using TmkGondorTreasury.DTOs.Enums;
@@ -77,119 +79,16 @@ public class StripeRegistrationService
 
 
     }
-
-    public async Task<PaymentIntent> CreatePaymentIntent(string customerId, string priceId, long amount)
-    {
-        var paymentIntentService = new PaymentIntentService();
-        var paymentIntentOptions = new PaymentIntentCreateOptions
-        {
-            Amount = amount,
-            Currency = "USD",
-            Customer = customerId,
-            PaymentMethodTypes = new List<string> { "card", "affirm", "amazon_pay", "paypal" },
-            AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions
-            {
-                Enabled = true
-            },
-
-        };
-        return await paymentIntentService.CreateAsync(paymentIntentOptions);
-
-    }
-
-    public async Task<SetupIntentDto> CreateCustomerAndSetupIntent(UserDto user)
-    {
-        try
-        {
-            var customerService = new CustomerService();
-            var customerRetrieved = await customerService.ListAsync(new CustomerListOptions { Email = user.Email, Limit = 1 });
-            Customer customer = customerRetrieved.Data.Count > 0
-                                    ? customerRetrieved.Data[0]
-                                    : await CreateCustomer(user);
-
-            var priceId = GetPriceId(GetSubscriptionPlan(user.SubscriptionPlan ?? ""));
-            var priceService = new PriceService();
-            var price = await priceService.GetAsync(priceId);
-            var paymentIntentService = new PaymentIntentService();
-            var paymentIntentOptions = new PaymentIntentCreateOptions
-            {
-                Customer = customer.Id,
-                Amount = price.UnitAmount,
-                Currency = "usd", // Set your currency
-                AutomaticPaymentMethods = new PaymentIntentAutomaticPaymentMethodsOptions { Enabled = true },
-            };
-            var paymentIntent = await paymentIntentService.CreateAsync(paymentIntentOptions);
-            return new SetupIntentDto
-            {
-                CustomerId = customer.Id,
-                IntentClientSecret = paymentIntent.ClientSecret
-            };
-        }
-        catch (StripeException)
-        {
-            throw new Exception("Stripe issues crashed the payment flow [$$-5]");
-        }
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
-    }
-
-
-    public async Task<Subscription> AttachPaymentMethodAndCreateSubscription
-    (
-        string customerId, // Customer ID
-        string paymentMethodId, // Payment Method ID
-        SubscriptionPlan subscriptionPlan // Subscription Plan
-    )
-    {
-        try
-        {
-            var paymentMethodService = new PaymentMethodService();
-            await paymentMethodService.AttachAsync(paymentMethodId, new PaymentMethodAttachOptions
-            {
-                Customer = customerId
-            });
-
-            var customerService = new CustomerService();
-            var customer = await customerService.UpdateAsync(customerId, new CustomerUpdateOptions
-            {
-                InvoiceSettings = new CustomerInvoiceSettingsOptions
-                {
-                    DefaultPaymentMethod = paymentMethodId
-                }
-            });
-
-
-
-            var subscriptionService = new SubscriptionService();
-            var priceId = GetPriceId(subscriptionPlan) ?? throw new ArgumentNullException("Price ID not found.");
-            var subscriptionsOptions = new SubscriptionCreateOptions
-            {
-                Customer = customerId,
-                Items = new List<SubscriptionItemOptions>
-                {
-                    new SubscriptionItemOptions
-                    {
-                        Price = priceId,
-                    }
-                },
-                Expand = new List<string> { "latest_invoice.payment_intent" }
-            };
-            var subscription = await subscriptionService.CreateAsync(subscriptionsOptions);
-            return subscription;
-        }
-        catch (StripeException)
-        {
-            throw new Exception("Stripe issues crashed the payment flow.");
-        }
-        catch (ArgumentNullException)
-        {
-            throw new Exception("Price ID not found. [$$-6]");
-        }
-    }
-
-
+    
+    /// <summary>
+    /// The function `GetPriceId` retrieves the price ID for a given subscription plan from
+    /// configuration settings.
+    /// </summary>
+    /// <param name="SubscriptionPlan">SubscriptionPlan is an enum representing different subscription
+    /// plans such as Basic, Standard, and Premium.</param>
+    /// <returns>
+    /// The `GetPriceId` method returns the price ID associated with the provided `SubscriptionPlan`.
+    /// </returns>
     public string GetPriceId(SubscriptionPlan subscriptionPlan)
     {
         string? priceId = subscriptionPlan switch
@@ -202,9 +101,21 @@ public class StripeRegistrationService
         return priceId;
     }
 
-    public SubscriptionPlan GetSubscriptionPlan(string subcription)
+    /// <summary>
+    /// The function `GetSubscriptionPlan` takes a subscription string and returns the corresponding
+    /// SubscriptionPlan enum value.
+    /// </summary>
+    /// <param name="subscription">The `GetSubscriptionPlan` method takes a string parameter
+    /// `subscription` which represents the type of subscription plan. The method then uses a switch
+    /// statement to map the input string to the corresponding `SubscriptionPlan` enum value (`Basic`,
+    /// `Standard`, or `Premium`). If the input string does not match</param>
+    /// <returns>
+    /// The `GetSubscriptionPlan` method returns a `SubscriptionPlan` enum value based on the input
+    /// `subscription` string.
+    /// </returns>
+    public SubscriptionPlan GetSubscriptionPlan(string subscription)
     {
-        SubscriptionPlan subscriptionPlan = subcription switch
+        SubscriptionPlan subscriptionPlan = subscription switch
         {
             "subscription-basic" => SubscriptionPlan.Basic,
             "subscription-standard" => SubscriptionPlan.Standard,
@@ -212,6 +123,58 @@ public class StripeRegistrationService
             _ => throw new Exception("Invalid subscription plan.")
         };
         return subscriptionPlan;
+    }
+
+    /// <summary>
+    /// This function creates a subscription for a customer with a specific price, using Stripe API,
+    /// and returns the subscription ID and client secret.
+    /// </summary>
+    /// <param name="customerId">The `customerId` parameter in the `CreateSubscription` method is the
+    /// identifier of the customer for whom you want to create a subscription. This customer should
+    /// already exist in your system or in the Stripe Customer database. It is used to associate the
+    /// subscription with the specific customer account.</param>
+    /// <param name="priceId">The `priceId` parameter in the `CreateSubscription` method represents the
+    /// ID of the price that you want to associate with the subscription. This price ID is typically
+    /// obtained from Stripe when you create a product and its corresponding price. It is used to
+    /// specify the billing details and amount associated with the subscription</param>
+    /// <returns>
+    /// The method `CreateSubscription` returns a `Task` that will eventually resolve to a
+    /// `SubscriptionCreateResponse` object.
+    /// </returns>
+    public async Task<SubscriptionCreateResponse> CreateSubscription(string customerId, string priceId)
+    {
+        var paymentSettings = new SubscriptionPaymentSettingsOptions
+        {
+            SaveDefaultPaymentMethod = "on_subscription"
+        };
+        var subscriptionOptions = new SubscriptionCreateOptions
+        {
+            Customer = customerId,
+            Items = new List<SubscriptionItemOptions>
+            {
+                new SubscriptionItemOptions
+                {
+                    Price = priceId,
+                }
+            },
+            PaymentSettings = paymentSettings,
+            PaymentBehavior = "default_incomplete",
+        };
+        subscriptionOptions.AddExpand("latest_invoice.payment_intent");
+        var subscriptionService = new SubscriptionService();
+        try
+        {
+            Subscription subscription = await subscriptionService.CreateAsync(subscriptionOptions);
+            return new SubscriptionCreateResponse
+            {
+                SubscriptionId = subscription.Id,
+                ClientSecret = subscription.LatestInvoice.PaymentIntent.ClientSecret
+            };
+        }
+        catch (StripeException)
+        {
+            throw;
+        }
     }
 
 }
