@@ -13,4 +13,9 @@
     <PackageReference Include="Stripe.net" Version="42.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Api/Webhooks/" />
+    <Folder Include="DTOs/WebHooksEvents/" />
+  </ItemGroup>
+
 </Project>

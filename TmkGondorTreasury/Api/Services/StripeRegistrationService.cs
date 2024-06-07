@@ -17,6 +17,16 @@ public class StripeRegistrationService
         StripeConfiguration.ApiKey = _stripeSecretKey;
     }
 
+    /// <summary>
+    /// This C# function creates a new customer using user data and handles any Stripe exceptions that
+    /// may occur.
+    /// </summary>
+    /// <param name="UserDto">UserDto is a data transfer object that contains information about a user,
+    /// such as their email, first name, last name, and subscription plan.</param>
+    /// <returns>
+    /// The method `CreateCustomer` is returning a `Task<Customer>`. This means that it is an
+    /// asynchronous method that will return a `Customer` object once it completes its execution.
+    /// </returns>
     public async Task<Customer> CreateCustomer(UserDto userDto)
     {
         try
@@ -42,42 +52,6 @@ public class StripeRegistrationService
 
             throw new Exception("Stripe issues crashed the payment flow [$$-4]");
         }
-    }
-
-    public async Task<PaymentIntent> CreatePaymentIntentForSubscription(PaymentIntentDto paymentIntentDto)
-    {
-        try
-        {
-            var subscriptionService = new SubscriptionService();
-            var priceId = GetPriceId(paymentIntentDto.SubscriptionPlan) ?? throw new ArgumentNullException("Price ID not found.");
-            var subscription = await subscriptionService.CreateAsync(new SubscriptionCreateOptions
-            {
-                Customer = paymentIntentDto?.CustomerId,
-                Items = new List<SubscriptionItemOptions>
-            {
-                new SubscriptionItemOptions
-                {
-                    Price = priceId,
-                }
-
-            }
-            });
-            var paymentIntentId = subscription.LatestInvoice.PaymentIntentId;
-            var paymentIntentService = new PaymentIntentService();
-            return await paymentIntentService.GetAsync(paymentIntentId);
-        }
-        catch (StripeException)
-        {
-            throw new Exception("Stripe issues crashed the payment flow.");
-        }
-
-        catch (Exception e)
-        {
-            throw new Exception(e.Message);
-        }
-
-
-
     }
     
     /// <summary>
