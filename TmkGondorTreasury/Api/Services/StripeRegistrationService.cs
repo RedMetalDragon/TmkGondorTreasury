@@ -1,6 +1,5 @@
 ﻿namespace TmkGondorTreasury.Services;
 
-using Microsoft.AspNetCore.Http.HttpResults;
 using Stripe;
 using TmkGondorTreasury.DTOs;
 using TmkGondorTreasury.DTOs.Enums;
@@ -54,7 +53,7 @@ public class StripeRegistrationService
         }
     }
 
-    
+
     /// <summary>
     /// The function `GetPriceId` returns the price ID associated with a given subscription plan using
     /// configuration values.

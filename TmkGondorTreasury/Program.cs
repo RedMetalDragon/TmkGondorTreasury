@@ -1,4 +1,5 @@
 using TmkGondorTreasury.Config;
+using TmkGondorTreasury.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +16,6 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-
     // app.UseSwagger();
     // app.UseSwaggerUI();
 }
@@ -23,5 +23,9 @@ app.UseCors();
 app.UseRouting();
 app.UseSession();
 app.UseHttpsRedirection();
+app.UseEndpoints(endpoints =>
+{
+    _ = endpoints.MapControllers();
+});
 app.MapControllers();
 app.Run();

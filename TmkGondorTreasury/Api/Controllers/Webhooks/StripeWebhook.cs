@@ -1,24 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
 using Stripe;
+using TmkGondorTreasury.Utils;
 using System;
 
 namespace TmkGondorTreasury.Api.Controllers.Webhooks
 {
     [ApiController]
-    [Route("webhooks/tmk-gondor-treasury/stripe")]
+    [Route("webhook")]
     public class StripeWebhookController : ControllerBase
     {
-        private readonly IConfiguration? _configuration;
-        [HttpPost]
+        [HttpPost("stripe")]
         public async Task<IActionResult> HandleStripeEvent()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
+            // TODO: Move to config
+            // TODO: Add as ENV variable in .ENV files
+            const string endpointSecret = "whsec_lOMsnM7e2sd2x6C1ahBk3rsqdFi28Kjr"; 
             Event stripeEvent;
             try
             {
 
-                var webHookSecret = _configuration?["Stripe:WebhookSecret"];
-                stripeEvent = EventUtility.ConstructEvent(json, Request.Headers["Stripe-Signature"], webHookSecret);
+                stripeEvent = EventUtility.ParseEvent(json);
+                var signatureHeader = Request.Headers["Stripe-Signature"];
+                stripeEvent = EventUtility.ConstructEvent(json,
+                    signatureHeader, endpointSecret);
                 //TODO line below should be go to the logging logic for this service
                 Console.WriteLine($"Stripe event type: {stripeEvent.Type}");
                 switch (stripeEvent.Type)
@@ -27,9 +32,11 @@ namespace TmkGondorTreasury.Api.Controllers.Webhooks
                         // TODO Save user in DB
                         //var session = stripeEvent.Data.Object as Session;
                         Console.WriteLine("Checkout session completed");
+                        //FileCreator fileCreator = new FileCreator("Checkout session completed");
                         return Ok();
                     case "invoice.paid":
-                        Console.WriteLine("Invoice paid");
+                        Console.WriteLine("Invoice paid completed");
+                        //FileCreator file = new FileCreator("Invoice paied");
                         // TODO Update user subscription
                         //var invoice = stripeEvent.Data.Object as Invoice;
                         return Ok();
@@ -42,6 +49,12 @@ namespace TmkGondorTreasury.Api.Controllers.Webhooks
             {
                 return BadRequest(e.Message);
             }
+        }
+
+        [HttpGet("text")]
+        public IActionResult GetText()
+        {
+            return Ok("Hello World");
         }
     }
 }
