@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TmkGondorTreasury.Services;
 using TmkGondorTreasury.DTOs;
+using Stripe;
 
 namespace TmkGondorTreasury.Api.Controllers
 {
@@ -18,24 +19,8 @@ namespace TmkGondorTreasury.Api.Controllers
         }
 
         // POST: api/users/register-new-user/step-one
-        [HttpPost("register-new-user/step-one")]
-        public async Task<ActionResult<string>> RegisterNewUserFirstStep([FromBody] UserDto userDto)
-        {
-            // In this step the user sends the user data to be saved in the session storage
-            try
-            {
-                await _sessionStorageService.SaveUser(userDto);
-                return Created("", "Step one completed successfully!");
-            }
-            catch (Exception e)
-            {
-                return BadRequest(e.Message);
-            }
-        }
-
-        // POST: api/users/register-new-user/step-two
-        [HttpPost("register-new-user/step-two")]
-        public async Task<ActionResult<string>> RegisterUserSecondStep([FromBody] UserDto? userDto)
+        [HttpPost("register-new-user/user-details")]
+        public async Task<ActionResult<string>> RegisterNewUserFirstStep([FromBody] UserDto? userDto)
         {
             // In this step the user is already saved in the session storage
             // and sends the subcription plan and payment method to create the payment intent
@@ -46,12 +31,24 @@ namespace TmkGondorTreasury.Api.Controllers
                     return BadRequest("User data is missing.");
                 }
                 await _sessionStorageService.SaveUser(userDto);
-                var setupIntent = await _stripeRegistrationService.CreateCustomerAndSetupIntent(userDto);
-                return Ok(new { setupIntent.CustomerId, setupIntent.IntentClientSecret });
+                var customer = await _stripeRegistrationService.CreateCustomer(userDto);
+                var subscriptionPlan = _stripeRegistrationService.GetSubscriptionPlan(userDto.SubscriptionPlan ?? throw new ArgumentNullException("Subscription plan is missing."));
+                var priceId = _stripeRegistrationService.GetPriceId(subscriptionPlan);
+                var result = await _stripeRegistrationService.CreateSubscription(customer.Id, priceId);
+                result.CustomerId = customer.Id;
+                return Ok(result);
+                //
+                //var setupIntent = await _stripeRegistrationService.CreateCustomerAndSetupIntent(userDto);
+                //return Ok(new { success = true, setupIntent.CustomerId, setupIntent.IntentClientSecret });
             }
             catch (NotImplementedException)
             {
                 return BadRequest("Subscription plan invalid. [$$-3]");
+            }
+            catch (StripeException)
+            {
+                return BadRequest("Failed to create subscription. [$$-8]");
+
             }
             catch (Exception)
             {
@@ -59,31 +56,5 @@ namespace TmkGondorTreasury.Api.Controllers
             }
         }
 
-        // POST: api/users/register-new-user/attach-payment-method
-        [HttpPost("register-new-user/attach-payment-method")]
-        public async Task<IActionResult> AttachPaymentMethod([FromBody] PaymentIntentDto paymentIntentDto)
-        {
-            try
-            {
-                var subscription = await _stripeRegistrationService.AttachPaymentMethodAndCreateSubscription
-                    (
-                        paymentIntentDto.CustomerId ?? throw new ArgumentNullException("Customer ID is missing."),
-                        paymentIntentDto.PaymentMethodId ?? throw new ArgumentNullException("Payment Method ID is missing."),
-                        paymentIntentDto.SubscriptionPlan
-                    );
-
-                return Ok(new { succss = true, subscriptionId = subscription.Id });
-
-            }
-            catch (ArgumentNullException e)
-            {
-                return BadRequest(e.Message);
-            }
-            catch (Exception)
-            {
-                return BadRequest("Error attaching payment method. Unknown error [$$-7]");
-            }
-
-        }
     }
 }
