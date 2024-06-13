@@ -6,7 +6,7 @@ using Stripe;
 namespace TmkGondorTreasury.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class UsersController : ControllerBase
     {
         private readonly SessionStorageService _sessionStorageService;

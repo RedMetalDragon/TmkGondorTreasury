@@ -8,7 +8,7 @@ using TmkGondorTreasury.Services;
 
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("hooks/[controller]")]
 public class WebhookController(SessionStorageService sessionStorageService) : ControllerBase
 {
     private const string _webhookSecret = "whsec_...";
@@ -25,13 +25,13 @@ public class WebhookController(SessionStorageService sessionStorageService) : Co
             {
                 return BadRequest();
             }
-            if ( stripeEvent.Data.Object is not PaymentIntent paymentIntent 
+            if (stripeEvent.Data.Object is not PaymentIntent paymentIntent
                 || paymentIntent.Metadata == null
-                || paymentIntent.Metadata["email"] == null )
-                {
-                    return BadRequest();
-                }
-            
+                || paymentIntent.Metadata["email"] == null)
+            {
+                return BadRequest();
+            }
+
             return Ok(await _sessionStorageService.GetUser(paymentIntent.Metadata["email"]));
             //await _sessionStorageService.RemoveUser(paymentIntent.Metadata["email"]);
         }

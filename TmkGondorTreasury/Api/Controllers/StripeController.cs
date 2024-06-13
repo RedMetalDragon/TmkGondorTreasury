@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace TmkGondorTreasury.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     public class StripeController : ControllerBase
     {
         [HttpGet]
