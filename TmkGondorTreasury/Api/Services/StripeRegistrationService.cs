@@ -1,15 +1,17 @@
 ﻿namespace TmkGondorTreasury.Services;
 
 using Stripe;
+using TmkGondorTreasury.Api.Services;
 using TmkGondorTreasury.DTOs;
 using TmkGondorTreasury.DTOs.Enums;
+using TmkGondorTreasury.Exceptions;
 
 public class StripeRegistrationService
 {
     private readonly string _stripeSecretKey;
-    private readonly IConfiguration _configuration;
+    private readonly IGondorConfigurationService _configuration;
 
-    public StripeRegistrationService(string stripeSecretKey, IConfiguration configuration)
+    public StripeRegistrationService(string stripeSecretKey, IGondorConfigurationService configuration)
     {
         _stripeSecretKey = stripeSecretKey;
         _configuration = configuration;
@@ -68,38 +70,12 @@ public class StripeRegistrationService
     {
         string? priceId = subscriptionPlan switch
         {
-            SubscriptionPlan.Basic => GetConfigurationValue("Stripe:Subscriptions:PriceId:Basic"),
-            SubscriptionPlan.Standard => GetConfigurationValue("Stripe:Subscriptions:PriceId:Standard"),
-            SubscriptionPlan.Premium => GetConfigurationValue("Stripe:Subscriptions:PriceId:Premium"),
-            _ => throw new Exception("Invalid subscription plan.")
+            SubscriptionPlan.Basic => _configuration.GetConfigurationValue("Stripe:Subscriptions:PriceId:Basic"),
+            SubscriptionPlan.Standard => _configuration.GetConfigurationValue("Stripe:Subscriptions:PriceId:Standard"),
+            SubscriptionPlan.Premium => _configuration.GetConfigurationValue("Stripe:Subscriptions:PriceId:Premium"),
+            _ => throw new PriceIdException("Invalid subscription plan.")
         } ?? throw new Exception("Price ID not found.");
         return priceId;
-    }
-
-    /// <summary>
-    /// The function `GetConfigurationValue` retrieves a configuration value first from .NET secrets or
-    /// appsettings, and then from environment variables if not found.
-    /// </summary>
-    /// <param name="key">The `key` parameter is a string that represents the configuration key for
-    /// which the value needs to be retrieved. It is used to look up configuration values from various
-    /// sources like .NET secrets, appsettings, and environment variables.</param>
-    /// <returns>
-    /// The method `GetConfigurationValue` returns a string value that represents the configuration
-    /// value associated with the provided key. If the value is not found in the configuration settings,
-    /// it attempts to retrieve the value from environment variables.
-    /// </returns>
-    private string? GetConfigurationValue(string key)
-    {
-        // Try to get the value from .NET secrets or appsettings
-        string? value = _configuration[key];
-
-        // If not found, try to get the value from environment variables
-        if (string.IsNullOrEmpty(value))
-        {
-            value = Environment.GetEnvironmentVariable(key.Replace(':', '_').ToUpper());
-        }
-
-        return value;
     }
 
     /// <summary>

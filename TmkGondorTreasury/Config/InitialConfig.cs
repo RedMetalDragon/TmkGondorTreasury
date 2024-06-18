@@ -1,3 +1,4 @@
+using TmkGondorTreasury.Api.Services;
 using TmkGondorTreasury.Services;
 
 namespace TmkGondorTreasury.Config
@@ -8,6 +9,7 @@ namespace TmkGondorTreasury.Config
         {
             services.AddControllers();
             services.AddDistributedMemoryCache();
+            services.AddSingleton<IGondorConfigurationService, GondorConfigurationService>();
             services.AddSession(options =>
             {
                 options.Cookie.Name = ".TmkGondorTreasury.Session";
@@ -29,7 +31,13 @@ namespace TmkGondorTreasury.Config
                     });
             });
             services.AddScoped<SessionStorageService>();
-            services.AddScoped<StripeRegistrationService>(sp => new StripeRegistrationService(configuration["Stripe:ApiKey"] ?? "Secret Stripe Key not provided", configuration));
+            services.AddScoped<StripeRegistrationService>(sp =>
+            {
+                var configService = sp.GetRequiredService<IGondorConfigurationService>();
+                string stripeApiKey = configService.GetConfigurationValue("Stripe:ApiKey") ?? "Secret Stripe Key not provided";
+                System.Console.WriteLine($"Stripe Key: {stripeApiKey}");
+                return new StripeRegistrationService(stripeApiKey, configService);
+            });
         }
         public static void ConfigureApp(this WebApplication webApplication)
         {

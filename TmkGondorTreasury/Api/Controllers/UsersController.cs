@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TmkGondorTreasury.Services;
 using TmkGondorTreasury.DTOs;
 using Stripe;
+using TmkGondorTreasury.Exceptions;
 
 namespace TmkGondorTreasury.Api.Controllers
 {
@@ -49,6 +50,10 @@ namespace TmkGondorTreasury.Api.Controllers
             {
                 return BadRequest("Failed to create subscription. [$$-8]");
 
+            }
+            catch (PriceIdException)
+            {
+                return BadRequest("Error reading PriceId for subscription selected [$$-9]");
             }
             catch (Exception)
             {

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Mvc;
 using TmkGondorTreasury.Config;
 using TmkGondorTreasury.Utils;
 
@@ -12,7 +13,11 @@ builder.Services.AddSwaggerGen();
 InitialConfig.ConfigureServices(builder.Services, builder.Configuration);
 
 var app = builder.Build();
-
+var list = System.Environment.GetEnvironmentVariables(EnvironmentVariableTarget.Machine);
+foreach (var item in list.Keys)
+{
+    Console.WriteLine($"{item} : {list[item]}");
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
