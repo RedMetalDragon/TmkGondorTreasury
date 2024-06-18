@@ -10,9 +10,11 @@ public class StripeRegistrationService
 {
     private readonly string _stripeSecretKey;
     private readonly IGondorConfigurationService _configuration;
+    private readonly ILogger<StripeRegistrationService> _logger;
 
-    public StripeRegistrationService(string stripeSecretKey, IGondorConfigurationService configuration)
+    public StripeRegistrationService(string stripeSecretKey, IGondorConfigurationService configuration, ILogger<StripeRegistrationService> logger)
     {
+        _logger = logger;
         _stripeSecretKey = stripeSecretKey;
         _configuration = configuration;
         StripeConfiguration.ApiKey = _stripeSecretKey;
@@ -54,7 +56,6 @@ public class StripeRegistrationService
             throw new Exception("Stripe issues crashed the payment flow [$$-4]");
         }
     }
-
 
     /// <summary>
     /// The function `GetPriceId` returns the price ID associated with a given subscription plan using

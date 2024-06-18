@@ -8,16 +8,13 @@ namespace TmkGondorTreasury.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UsersController : ControllerBase
+    public class UsersController(
+                                    SessionStorageService sessionStorageService,
+                                    StripeRegistrationService stripeRegistrationService
+                                ) : ControllerBase
     {
-        private readonly SessionStorageService _sessionStorageService;
-        private readonly StripeRegistrationService _stripeRegistrationService;
-
-        public UsersController(SessionStorageService sessionStorageService, StripeRegistrationService stripeRegistrationService)
-        {
-            _sessionStorageService = sessionStorageService;
-            _stripeRegistrationService = stripeRegistrationService;
-        }
+        private readonly SessionStorageService _sessionStorageService = sessionStorageService;
+        private readonly StripeRegistrationService _stripeRegistrationService = stripeRegistrationService;
 
         // POST: api/users/register-new-user/step-one
         [HttpPost("register-new-user/user-details")]

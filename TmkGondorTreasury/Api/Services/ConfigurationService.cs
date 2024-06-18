@@ -1,15 +1,15 @@
-using Microsoft.Extensions.Configuration;
-
 namespace TmkGondorTreasury.Api.Services
 {
     public interface IGondorConfigurationService
     {
         string GetConfigurationValue(string key);
+
     }
 
     public class GondorConfigurationService : IGondorConfigurationService
     {
         private readonly IConfiguration _configuration;
+
 
         public GondorConfigurationService(IConfiguration configuration)
         {
@@ -44,5 +44,6 @@ namespace TmkGondorTreasury.Api.Services
 
             return value ?? throw new InvalidOperationException($"Configuration value for key '{key}' not found.");
         }
+
     }
 }
