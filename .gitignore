@@ -3,3 +3,5 @@ TmkGondorTreasury/bin/
 TmkGondorTreasury/obj/
 secrets.json
 .DS_Store
+.idea/
+Properties/launchSettings.json
