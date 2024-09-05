@@ -14,6 +14,7 @@ public class WebhookController(SessionStorageService sessionStorageService) : Co
     private const string _webhookSecret = "whsec_...";
     private readonly SessionStorageService _sessionStorageService = sessionStorageService;
 
+    // This controller is overwhemled with more logic than required
     [HttpPost]
     public async Task<IActionResult> StripeWebhookUserRegistered()
     {
