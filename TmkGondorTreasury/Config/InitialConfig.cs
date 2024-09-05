@@ -1,5 +1,5 @@
+using TmkGondorTreasury.Api.Services;
 using TmkGondorTreasury.Services;
-
 namespace TmkGondorTreasury.Config
 {
     public static class InitialConfig
@@ -8,6 +8,7 @@ namespace TmkGondorTreasury.Config
         {
             services.AddControllers();
             services.AddDistributedMemoryCache();
+            services.AddSingleton<IGondorConfigurationService, GondorConfigurationService>();
             services.AddSession(options =>
             {
                 options.Cookie.Name = ".TmkGondorTreasury.Session";
@@ -29,21 +30,50 @@ namespace TmkGondorTreasury.Config
                     });
             });
             services.AddScoped<SessionStorageService>();
-            services.AddScoped<StripeRegistrationService>(sp => new StripeRegistrationService(configuration["Stripe:ApiKey"] ?? "Secret Stripe Key not provided", configuration));
+            services.AddScoped<StripeRegistrationService>(sp =>
+            {
+                var configService = sp.GetRequiredService<IGondorConfigurationService>();
+                string stripeApiKey = configService.GetConfigurationValue("Stripe:ApiKey") ?? "Secret Stripe Key not provided";
+                return new StripeRegistrationService(stripeApiKey, configService, sp.GetRequiredService<ILogger<StripeRegistrationService>>());
+            });
         }
+
         public static void ConfigureApp(this WebApplication webApplication)
         {
-            //var stripeConfig = webApplication.Configuration.GetSection("Stripe").Get<StripeConfig>();
-            // stripe key set as secret
-            if (webApplication.Environment.IsDevelopment())
-            {
 
-            }
+
         }
+
         public static void ConfigureMiddleware(IApplicationBuilder app)
         {
             // Implement 
 
         }
+
+        public static void LogSelectedConfigurationValues(IConfiguration configuration, Serilog.ILogger logger)
+        {
+            var keysToLog = new List<string>
+            {
+                "STRIPE_APIKEY", 
+                // Assuming you want to check it's loaded but not log the actual key
+                //"SomeOtherConfigKey",
+                //"YetAnotherConfigKey"
+            };
+
+            foreach (var key in keysToLog)
+            {
+                var value = configuration[key];
+                if (!string.IsNullOrEmpty(value))
+                {
+                    // Log a masked value or a confirmation that the key is present, but not the actual value
+                    logger.Information("{Key} is configured.", key);
+                }
+                else
+                {
+                    logger.Error("{Key} is not configured.", key);
+                }
+            }
+        }
+
     }
 }

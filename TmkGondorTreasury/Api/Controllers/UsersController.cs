@@ -2,21 +2,19 @@ using Microsoft.AspNetCore.Mvc;
 using TmkGondorTreasury.Services;
 using TmkGondorTreasury.DTOs;
 using Stripe;
+using TmkGondorTreasury.Exceptions;
 
 namespace TmkGondorTreasury.Api.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
-    public class UsersController : ControllerBase
+    [Route("[controller]")]
+    public class UsersController(
+                                    SessionStorageService sessionStorageService,
+                                    StripeRegistrationService stripeRegistrationService
+                                ) : ControllerBase
     {
-        private readonly SessionStorageService _sessionStorageService;
-        private readonly StripeRegistrationService _stripeRegistrationService;
-
-        public UsersController(SessionStorageService sessionStorageService, StripeRegistrationService stripeRegistrationService)
-        {
-            _sessionStorageService = sessionStorageService;
-            _stripeRegistrationService = stripeRegistrationService;
-        }
+        private readonly SessionStorageService _sessionStorageService = sessionStorageService;
+        private readonly StripeRegistrationService _stripeRegistrationService = stripeRegistrationService;
 
         // POST: api/users/register-new-user/step-one
         [HttpPost("register-new-user/user-details")]
@@ -49,6 +47,10 @@ namespace TmkGondorTreasury.Api.Controllers
             {
                 return BadRequest("Failed to create subscription. [$$-8]");
 
+            }
+            catch (PriceIdException)
+            {
+                return BadRequest("Error reading PriceId for subscription selected [$$-9]");
             }
             catch (Exception)
             {
