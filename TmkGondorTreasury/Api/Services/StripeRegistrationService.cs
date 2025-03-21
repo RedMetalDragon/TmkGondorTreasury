@@ -3,7 +3,6 @@
 using Stripe;
 using TmkGondorTreasury.Api.Services;
 using TmkGondorTreasury.DTOs;
-using TmkGondorTreasury.DTOs.Enums;
 using TmkGondorTreasury.Exceptions;
 
 public class StripeRegistrationService

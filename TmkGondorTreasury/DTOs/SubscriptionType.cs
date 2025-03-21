@@ -11,9 +11,3 @@ public class SubscriptionType
     public string? SubscriptionDescription { get; set; }
     public required string PriceId { get; set; }
 }
-
-public enum SubscriptionBillingCycle
-{
-    Monthly,
-    Yearly
-}

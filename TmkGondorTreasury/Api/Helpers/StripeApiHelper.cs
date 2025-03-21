@@ -8,8 +8,8 @@ public class StripeApiHelper()
 {
     public static async Task<IEnumerable<SubscriptionType>> GetSubscriptionsTypes()
     {
-        var optionsPriceSearch = new PriceSearchOptions { Query = "active: true" };
-        var optionsProductSearch = new ProductSearchOptions { Query = "active: true" };
+        var optionsPriceSearch = new PriceSearchOptions { Query = "active: 'true'" };
+        var optionsProductSearch = new ProductSearchOptions { Query = "active: 'true'" };
         var priceService = new PriceService();
         var productService = new ProductService();
         var priceTask = priceService.SearchAsync(optionsPriceSearch);

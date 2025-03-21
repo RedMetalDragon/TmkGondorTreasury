@@ -5,3 +5,7 @@ secrets.json
 .DS_Store
 .idea/
 Properties/launchSettings.json
+/TmkGondorTreasuryTest/.env
+/TmkGondorTreasuryTest/bin/
+/TmkGondorTreasuryTest/obj/
+TmkGondorTreasuryTest/bin/Debug

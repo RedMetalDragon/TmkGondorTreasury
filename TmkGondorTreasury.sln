@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TmkGondorTreasury", "TmkGondorTreasury\TmkGondorTreasury.csproj", "{E5C22C40-1285-4031-8190-0366DCA6D88F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TmkGondorTreasuryTest", "TmkGondorTreasuryTest\TmkGondorTreasuryTest.csproj", "{8B689B92-9D54-4564-AC44-424E4B0939E0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{E5C22C40-1285-4031-8190-0366DCA6D88F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E5C22C40-1285-4031-8190-0366DCA6D88F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E5C22C40-1285-4031-8190-0366DCA6D88F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B689B92-9D54-4564-AC44-424E4B0939E0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B689B92-9D54-4564-AC44-424E4B0939E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B689B92-9D54-4564-AC44-424E4B0939E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B689B92-9D54-4564-AC44-424E4B0939E0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
