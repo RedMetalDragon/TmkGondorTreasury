@@ -1,13 +1,14 @@
 using Stripe;
+using TmkGondorTreasury.Api.Models;
 using TmkGondorTreasury.DTOs;
 
 namespace TmkGondorTreasury.Api.Helpers;
 
-
 public class StripeApiHelper()
 {
-    public static async Task<IEnumerable<SubscriptionType>> GetSubscriptionsTypes()
+    public async Task<IEnumerable<SubscriptionType>> GetSubscriptionsTypes(string stripeSecretKey)
     {
+        StripeConfiguration.ApiKey = stripeSecretKey;
         var optionsPriceSearch = new PriceSearchOptions { Query = "active: 'true'" };
         var optionsProductSearch = new ProductSearchOptions { Query = "active: 'true'" };
         var priceService = new PriceService();

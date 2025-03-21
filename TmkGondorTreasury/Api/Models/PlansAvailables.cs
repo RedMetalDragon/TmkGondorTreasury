@@ -1,4 +1,6 @@
-namespace TmkGondorTreasury.DTOs;
+using TmkGondorTreasury.DTOs;
+
+namespace TmkGondorTreasury.Api.Models;
 
 public class PlansAvailables
 {

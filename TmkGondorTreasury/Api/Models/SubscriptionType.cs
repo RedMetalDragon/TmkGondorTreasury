@@ -1,7 +1,11 @@
-namespace TmkGondorTreasury.DTOs;
+using TmkGondorTreasury.DTOs;
+using System.Text.Json.Serialization;
+
+namespace TmkGondorTreasury.Api.Models;
 
 public class SubscriptionType
 {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public SubscriptionBillingCycle SubscriptionBillingCycle { get; set; }
     public long SubscriptionAmount { get; set; }
     

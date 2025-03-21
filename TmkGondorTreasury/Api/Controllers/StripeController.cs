@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TmkGondorTreasury.Api.Helpers;
+using TmkGondorTreasury.Api.Models;
+using TmkGondorTreasury.Api.Services;
 using TmkGondorTreasury.DTOs;
 
 namespace TmkGondorTreasury.Api.Controllers
@@ -8,10 +10,19 @@ namespace TmkGondorTreasury.Api.Controllers
     [Route("[controller]")]
     public class StripeController : ControllerBase
     {
+        private readonly IGondorConfigurationService _configuration;
+
+        public StripeController(IGondorConfigurationService configuration)
+        {
+            _configuration = configuration;
+        }
+        
         [HttpGet]
         public async Task<OkObjectResult> Get()
         {
-            var subscriptions = await StripeApiHelper.GetSubscriptionsTypes();
+            var stripeSecretKey = _configuration.GetConfigurationValue("Stripe:APIKEY");
+            var stripeApiHelper = new StripeApiHelper();
+            var subscriptions = await stripeApiHelper.GetSubscriptionsTypes(stripeSecretKey);
             var subscriptionTypes = subscriptions as SubscriptionType[] ?? subscriptions.ToArray();
             var plans = new PlansAvailables
             {
