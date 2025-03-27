@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using TmkGondorTreasury.Services;
 using TmkGondorTreasury.DTOs;
 using Stripe;
+using TmkGondorTreasury.Api.Services;
 using TmkGondorTreasury.Exceptions;
 
 namespace TmkGondorTreasury.Api.Controllers

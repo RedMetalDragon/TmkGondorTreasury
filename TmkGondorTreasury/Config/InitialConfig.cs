@@ -1,3 +1,5 @@
+using TmkGondorTreasury.Api.Helpers;
+using TmkGondorTreasury.Api.Interfaces;
 using TmkGondorTreasury.Api.Services;
 using TmkGondorTreasury.Services;
 namespace TmkGondorTreasury.Config
@@ -25,15 +27,15 @@ namespace TmkGondorTreasury.Config
                         builder.AllowAnyOrigin()
                             .AllowAnyMethod()
                             .AllowAnyHeader()
-                            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                            ;
+                            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
                     });
             });
             services.AddScoped<SessionStorageService>();
+            services.AddScoped<IStripeHelper, StripeApiHelper>();
             services.AddScoped<StripeRegistrationService>(sp =>
             {
                 var configService = sp.GetRequiredService<IGondorConfigurationService>();
-                string stripeApiKey = configService.GetConfigurationValue("Stripe:ApiKey") ?? "Secret Stripe Key not provided";
+                string stripeApiKey = configService.GetConfigurationValue("Stripe:Api:Key") ?? "Secret Stripe Key not provided";
                 return new StripeRegistrationService(stripeApiKey, configService, sp.GetRequiredService<ILogger<StripeRegistrationService>>());
             });
         }
