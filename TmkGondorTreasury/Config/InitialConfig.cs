@@ -1,3 +1,5 @@
+using TmkGondorTreasury.Api.Helpers;
+using TmkGondorTreasury.Api.Interfaces;
 using TmkGondorTreasury.Api.Services;
 using TmkGondorTreasury.Services;
 namespace TmkGondorTreasury.Config
@@ -29,6 +31,7 @@ namespace TmkGondorTreasury.Config
                     });
             });
             services.AddScoped<SessionStorageService>();
+            services.AddScoped<IStripeHelper, StripeApiHelper>();
             services.AddScoped<StripeRegistrationService>(sp =>
             {
                 var configService = sp.GetRequiredService<IGondorConfigurationService>();

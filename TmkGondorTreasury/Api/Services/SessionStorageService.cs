@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using System.Threading.Tasks;
 using TmkGondorTreasury.DTOs;
 
-namespace TmkGondorTreasury.Services
+namespace TmkGondorTreasury.Api.Services
 {
     public class SessionStorageService
     {

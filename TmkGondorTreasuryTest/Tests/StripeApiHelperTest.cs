@@ -3,6 +3,7 @@ using Stripe;
 using TmkGondorTreasury.Api.Helpers;
 using TmkGondorTreasury.Api.Models;
 using TmkGondorTreasury.DTOs;
+using TmkGondorTreasuryTest.Mocks;
 
 namespace TmkGondorTreasuryTest.Tests;
 
@@ -24,8 +25,8 @@ public class StripeApiHelperTest
     [Fact]
     public async void ReturningValidSubscriptions()
     {
-        var stripeApiHelper = new StripeApiHelper();
-        var subscriptions = await stripeApiHelper.GetSubscriptionsTypes(Env.GetString("STRIPE_SECRET_KEY"));
+        var stripeApiHelper = new MockStripeHelper();
+        var subscriptions = await stripeApiHelper.GetSubscriptionsTypes();
         Assert.NotNull(subscriptions);
         Assert.NotEmpty(subscriptions);
     }
@@ -33,8 +34,8 @@ public class StripeApiHelperTest
     [Fact]
     public async void ReturningValidSubscriptionBillingCycle()
     {
-        var stripeApiHelper = new StripeApiHelper();
-        var subscriptions = await stripeApiHelper.GetSubscriptionsTypes(Env.GetString("STRIPE_SECRET_KEY"));
+        var stripeApiHelper = new MockStripeHelper();
+        var subscriptions = await stripeApiHelper.GetSubscriptionsTypes();
         var subscriptionTypes = subscriptions as SubscriptionType[] ?? subscriptions.ToArray();
         Assert.Equal(3, subscriptionTypes.Count(subscription => subscription.SubscriptionBillingCycle == SubscriptionBillingCycle.Monthly));
         Assert.Equal(3, subscriptionTypes.Count(subscription => subscription.SubscriptionBillingCycle == SubscriptionBillingCycle.Yearly));

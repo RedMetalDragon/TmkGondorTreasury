@@ -106,16 +106,16 @@ public class StripeRegistrationService
     /// This function creates a subscription for a customer with a specific price, using Stripe API,
     /// and returns the subscription ID and client secret.
     /// </summary>
-    /// <param name="customerId">The `customerId` parameter in the `CreateSubscription` method is the
+    /// <param name="customerId">The `customerId` parameter in the `CreateSubscriptionController` method is the
     /// identifier of the customer for whom you want to create a subscription. This customer should
     /// already exist in your system or in the Stripe Customer database. It is used to associate the
     /// subscription with the specific customer account.</param>
-    /// <param name="priceId">The `priceId` parameter in the `CreateSubscription` method represents the
+    /// <param name="priceId">The `priceId` parameter in the `CreateSubscriptionController` method represents the
     /// ID of the price that you want to associate with the subscription. This price ID is typically
     /// obtained from Stripe when you create a product and its corresponding price. It is used to
     /// specify the billing details and amount associated with the subscription</param>
     /// <returns>
-    /// The method `CreateSubscription` returns a `Task` that will eventually resolve to a
+    /// The method `CreateSubscriptionController` returns a `Task` that will eventually resolve to a
     /// `SubscriptionCreateResponse` object.
     /// </returns>
     public async Task<SubscriptionCreateResponse> CreateSubscription(string customerId, string priceId)
