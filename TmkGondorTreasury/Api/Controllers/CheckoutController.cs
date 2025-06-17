@@ -10,10 +10,10 @@ namespace TmkGondorTreasury.Api.Controllers;
 [Route("checkout")]
 public class CheckoutController : Controller
 {
-    private readonly ILogger<CreateSubscriptionController> _logger;
+    private readonly ILogger<CheckoutController> _logger;
     private readonly IStripeHelper _stripeHelper;
 
-    public CheckoutController(ILogger<CreateSubscriptionController> logger, IStripeHelper stripeHelper)
+    public CheckoutController(ILogger<CheckoutController> logger, IStripeHelper stripeHelper)
     {
         _logger = logger;
         _stripeHelper = stripeHelper;
