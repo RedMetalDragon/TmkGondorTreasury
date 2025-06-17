@@ -1,9 +1,8 @@
-﻿namespace TmkGondorTreasury.Services;
-
-using Stripe;
-using TmkGondorTreasury.Api.Services;
+﻿using Stripe;
 using TmkGondorTreasury.DTOs;
 using TmkGondorTreasury.Exceptions;
+
+namespace TmkGondorTreasury.Api.Services;
 
 public class StripeRegistrationService
 {

@@ -57,6 +57,18 @@ public class StripeApiHelper : IStripeHelper
         return await service.CreateAsync(options);
     }
 
+    public Task<Customer> CreateCustomer(string? email, string? fullName)
+    {
+        var options = new CustomerCreateOptions
+        {
+            Email = email,
+            Name = fullName,
+            Description = "Root account user"
+        };
+        var service = new CustomerService();
+        return service.CreateAsync(options);
+    }
+
     public async Task<Subscription> CreateSubscription(string? customerId, string? priceId)
     {
         try

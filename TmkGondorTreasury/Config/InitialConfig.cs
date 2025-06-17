@@ -1,7 +1,7 @@
 using TmkGondorTreasury.Api.Helpers;
 using TmkGondorTreasury.Api.Interfaces;
 using TmkGondorTreasury.Api.Services;
-using TmkGondorTreasury.Services;
+
 namespace TmkGondorTreasury.Config
 {
     public static class InitialConfig
