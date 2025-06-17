@@ -6,8 +6,6 @@ using Stripe;
 using System.IO;
 using System.Threading.Tasks;
 using TmkGondorTreasury.DTOs;
-using TmkGondorTreasury.Services;
-
 
 [ApiController]
 [Route("hooks/[controller]")]
