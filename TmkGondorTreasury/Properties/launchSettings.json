@@ -12,17 +12,19 @@
     "http": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "launchUrl": "swagger",
+      "launchBrowser": false,
+      "launchUrl": "health",
       "applicationUrl": "http://localhost:5192",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "STRIPE_APIKEY":"sk_test_51PAuaf05kjSh8547cCsNVa6pSV0pztGIKMTraFWtTHmPvCNh3Zr9O6UEO99eLjsn4PgzdOlpJte9Cy97DHg9IJaY00AIeF4QOF"
+      },
+      "console": "integratedTerminal"
     },
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7065;http://localhost:5192",
       "environmentVariables": {

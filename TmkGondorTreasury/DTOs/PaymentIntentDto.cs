@@ -1,5 +1,5 @@
 namespace TmkGondorTreasury.DTOs;
-using TmkGondorTreasury.DTOs.Enums;
+
 /// <summary>
 /// Represents a data transfer object for a payment intent.
 /// </summary>
