@@ -61,6 +61,12 @@ public class MockStripeHelper : IStripeHelper
         throw new NotImplementedException();
     }
 
+    public Task<Customer> CreateCustomer(string? email, string? fullName)
+    {
+        //TODO: Implement this method
+        throw new NotImplementedException();
+    }
+
     public Task<Subscription> CreateSubscription(string? customerId, string? priceId)
     {
         //TODO: Implement this method
