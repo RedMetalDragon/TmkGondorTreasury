@@ -2,6 +2,9 @@ using Microsoft.AspNetCore.Mvc;
 using Stripe;
 using TmkGondorTreasury.Utils;
 using System;
+using TmkGondorTreasury.Api.Interfaces;
+using TmkGondorTreasury.Api.Services;
+using TmkRabbitMqLibrary.Publisher.Interfaces;
 
 namespace TmkGondorTreasury.Api.Controllers.Webhooks
 {
@@ -9,25 +12,39 @@ namespace TmkGondorTreasury.Api.Controllers.Webhooks
     [Route("webhook")]
     public class StripeWebhookController : ControllerBase
     {
+        private readonly IGondorConfigurationService _configurationService;
+        private readonly ISubscriptionLifeCycleService _subscriptionLifeCycleService;
+
+        public StripeWebhookController(ISubscriptionLifeCycleService subscriptionLifeCycleService,
+            IGondorConfigurationService configurationService)
+        {
+            _subscriptionLifeCycleService = subscriptionLifeCycleService ??
+                                            throw new ArgumentNullException(nameof(subscriptionLifeCycleService));
+            _configurationService =
+                configurationService ?? throw new ArgumentNullException(nameof(configurationService));
+        }
+
         [HttpPost("stripe")]
         public async Task<IActionResult> HandleStripeEvent()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
             // TODO: Move to config
             // TODO: Add as ENV variable in .ENV files
-            const string endpointSecret = "whsec_lOMsnM7e2sd2x6C1ahBk3rsqdFi28Kjr"; 
+            string endpointSecret = _configurationService.GetConfigurationValue("STRIPE_WEBHOOKSECRET");
+            //const string endpointSecret = "whsec_lOMsnM7e2sd2x6C1ahBk3rsqdFi28Kjr";
             Event stripeEvent;
             try
             {
-
                 stripeEvent = EventUtility.ParseEvent(json);
                 var signatureHeader = Request.Headers["Stripe-Signature"];
-                stripeEvent = EventUtility.ConstructEvent(json,
-                    signatureHeader, endpointSecret);
+                stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, endpointSecret);
                 //TODO line below should be go to the logging logic for this service
                 Console.WriteLine($"Stripe event type: {stripeEvent.Type}");
                 switch (stripeEvent.Type)
                 {
+                    case "customer.subscription.created":
+                        await _subscriptionLifeCycleService.HandleSubscriptionCreated(stripeEvent);
+                        return Ok();
                     case "checkout.session.completed":
                         // TODO Save user in DB
                         //var session = stripeEvent.Data.Object as Session;

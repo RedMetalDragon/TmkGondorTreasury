@@ -98,6 +98,39 @@ public class StripeApiHelper : IStripeHelper
         }
     }
 
+    public async Task<Subscription> CreateSubscription(string? customerId, string? priceId, string? clientTxnId)
+    {
+        try
+        {
+            var metadata = new Dictionary<string, string>();
+            if (clientTxnId != null) 
+                metadata.Add("txnId", clientTxnId);
+            // Create subscription
+            var subscriptionOptions = new SubscriptionCreateOptions
+            {
+                Customer = customerId,
+                Items = new List<SubscriptionItemOptions>
+                {
+                    new SubscriptionItemOptions
+                    {
+                        Price = priceId,
+                    },
+                },
+                PaymentBehavior = "default_incomplete",
+                Metadata = metadata
+            };
+            subscriptionOptions.AddExpand("latest_invoice.payment_intent");
+            var subscriptionService = new SubscriptionService();
+
+            return await subscriptionService.CreateAsync(subscriptionOptions);
+        }
+        catch (StripeException e)
+        {
+            _logger.Log(LogLevel.Error, e, $"--Error creating subscription for customer: <{customerId}> --");
+            throw;
+        }
+    }
+
     public async Task<Session> CreateSession(string? customerId, string? priceId)
     {
         try

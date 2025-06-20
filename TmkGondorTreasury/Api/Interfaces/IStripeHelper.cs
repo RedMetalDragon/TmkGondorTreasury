@@ -13,6 +13,8 @@ public interface IStripeHelper
     Task<Customer> CreateCustomer(string? email, string? fullName);
 
     Task<Subscription> CreateSubscription(string? customerId, string? priceId);
+    
+    Task<Subscription> CreateSubscription(string? customerId, string? priceId, string? clientTxnId );
 
     Task<Stripe.Checkout.Session> CreateSession(string? email, string? customerId);
 

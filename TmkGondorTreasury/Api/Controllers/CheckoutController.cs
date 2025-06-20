@@ -27,7 +27,7 @@ public class CheckoutController : Controller
             var fullName = $"{createSubscriptionRequest.FirstName} {createSubscriptionRequest.LastName}";
             var customer = await _stripeHelper.CreateCustomer(createSubscriptionRequest.Email, fullName);
             var session = await _stripeHelper.CreateSession(customer.Id, createSubscriptionRequest.PriceId);
-            var subscription = await _stripeHelper.CreateSubscription(customer.Id, createSubscriptionRequest.PriceId);
+            var subscription = await _stripeHelper.CreateSubscription(customer.Id, createSubscriptionRequest.PriceId, createSubscriptionRequest.ClientTxnId);
             return Ok(new CreateCheckoutSessionResponse
             {
                 IntentClientSecret = subscription.LatestInvoice.PaymentIntent.ClientSecret,

@@ -14,4 +14,7 @@ public class CreateCheckoutSessionRequest
     [Required]
     [StringLength(50, MinimumLength = 1)]
     public required string LastName { get; set; }
+    
+    [Required]
+    public required string ClientTxnId { get; set; }
 }

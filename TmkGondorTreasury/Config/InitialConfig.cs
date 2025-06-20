@@ -1,6 +1,7 @@
 using TmkGondorTreasury.Api.Helpers;
 using TmkGondorTreasury.Api.Interfaces;
 using TmkGondorTreasury.Api.Services;
+using TmkRabbitMqLibrary.Extensions;
 
 namespace TmkGondorTreasury.Config
 {
@@ -21,42 +22,57 @@ namespace TmkGondorTreasury.Config
             services.AddHttpContextAccessor();
             services.AddCors(options =>
             {
-                options.AddDefaultPolicy(
-                    builder =>
-                    {
-                        builder.AllowAnyOrigin()
-                            .AllowAnyMethod()
-                            .AllowAnyHeader()
-                            .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
-                    });
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
+                });
             });
             services.AddScoped<SessionStorageService>();
             services.AddScoped<IStripeHelper, StripeApiHelper>();
             services.AddScoped<StripeRegistrationService>(sp =>
             {
                 var configService = sp.GetRequiredService<IGondorConfigurationService>();
-                string stripeApiKey = configService.GetConfigurationValue("Stripe:Api:Key") ?? "Secret Stripe Key not provided";
-                return new StripeRegistrationService(stripeApiKey, configService, sp.GetRequiredService<ILogger<StripeRegistrationService>>());
+                string stripeApiKey = configService.GetConfigurationValue("Stripe:Api:Key") ??
+                                      "Secret Stripe Key not provided";
+                return new StripeRegistrationService(stripeApiKey, configService,
+                    sp.GetRequiredService<ILogger<StripeRegistrationService>>());
             });
+
+            // setup rabbitMq
+            var retryConfiguration = new TmkRabbitMqLibrary.Configuration.RetryConfiguration
+            {
+                DefaultRetryRoutingKey = configuration.GetConfigurationValue("_rabbitMq_defaultRetryRoutingKey"),
+            };
+            var tmkRabbitMqSettings = new TmkRabbitMqLibrary.Configuration.TmkRabbitMqSettings
+            {
+                ConnectionString = configuration.GetConfigurationValue("_rabbitMq_connectionString"),
+                RetryConfig = retryConfiguration,
+                AutomaticRecoveryEnabled =
+                    Boolean.Parse(configuration.GetConfigurationValue("_rabbitMq_automaticRecoveryEnabled")),
+                RequestedHeartbeatAsMilliseconds =
+                    ushort.Parse(configuration.GetConfigurationValue("_rabbitMq_requestedHeartbeatAsMilliseconds")),
+                ServiceName = configuration.GetConfigurationValue("_rabbitMq_serviceName"),
+            };
+            services.AddTmkRabbitMqWithRegisteredHandlers(tmkRabbitMqSettings, true, false);
         }
 
         public static void ConfigureApp(this WebApplication webApplication)
         {
-
-
         }
 
         public static void ConfigureMiddleware(IApplicationBuilder app)
         {
             // Implement 
-
         }
 
         public static void LogSelectedConfigurationValues(IConfiguration configuration, Serilog.ILogger logger)
         {
             var keysToLog = new List<string>
             {
-                "STRIPE_APIKEY", 
+                "STRIPE_APIKEY",
                 // Assuming you want to check it's loaded but not log the actual key
                 //"SomeOtherConfigKey",
                 //"YetAnotherConfigKey"
@@ -76,6 +92,5 @@ namespace TmkGondorTreasury.Config
                 }
             }
         }
-
     }
 }

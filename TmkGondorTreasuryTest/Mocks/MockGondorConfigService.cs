@@ -1,4 +1,5 @@
 using TmkGondorTreasury.Api.Services;
+using TmkRabbitMqLibrary.Configuration;
 
 namespace TmkGondorTreasuryTest.Mocks;
 
@@ -16,5 +17,10 @@ public class MockGondorConfigService : IGondorConfigurationService
             "Stripe:SecretKey" => envVariables["StripeSecretKey"],
             _ => throw new Exception("Key not found")
         };
+    }
+
+    public TmkRabbitMqSettings GetRabbitMqSettings()
+    {
+        throw new NotImplementedException();
     }
 }

@@ -73,6 +73,11 @@ public class MockStripeHelper : IStripeHelper
         throw new NotImplementedException();
     }
 
+    public Task<Subscription> CreateSubscription(string? customerId, string? priceId, string? clientTxnId)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<Session> CreateSession(string? email, string? customerId)
     {
         throw new NotImplementedException();

@@ -20,7 +20,6 @@ public class Program
 
         // Add services to the container.
         InitialConfig.ConfigureServices(builder.Services, builder.Configuration);
-
         var app = builder.Build();
         var logger = app.Services.GetRequiredService<Serilog.ILogger>();
         InitialConfig.LogSelectedConfigurationValues(builder.Configuration, logger);
