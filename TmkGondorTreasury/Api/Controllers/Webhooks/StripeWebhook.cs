@@ -28,20 +28,20 @@ namespace TmkGondorTreasury.Api.Controllers.Webhooks
         public async Task<IActionResult> HandleStripeEvent()
         {
             var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
-            // TODO: Move to config
-            // TODO: Add as ENV variable in .ENV files
-            string endpointSecret = _configurationService.GetConfigurationValue("STRIPE_WEBHOOKSECRET");
-            //const string endpointSecret = "whsec_lOMsnM7e2sd2x6C1ahBk3rsqdFi28Kjr";
+            string webhookSecret = _configurationService.GetConfigurationValue("STRIPE_WEBHOOKSECRET");
             Event stripeEvent;
             try
             {
                 stripeEvent = EventUtility.ParseEvent(json);
                 var signatureHeader = Request.Headers["Stripe-Signature"];
-                stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, endpointSecret);
+                stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, webhookSecret);
                 //TODO line below should be go to the logging logic for this service
                 Console.WriteLine($"Stripe event type: {stripeEvent.Type}");
                 switch (stripeEvent.Type)
                 {
+                    case "invoice.payment_succeeded":
+                        await _subscriptionLifeCycleService.HandleInvoicePaymentSuccess(stripeEvent);
+                        return Ok();
                     case "customer.subscription.created":
                         await _subscriptionLifeCycleService.HandleSubscriptionCreated(stripeEvent);
                         return Ok();

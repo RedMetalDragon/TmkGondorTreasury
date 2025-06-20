@@ -17,7 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Api/Webhooks/" />
     <Folder Include="DTOs/WebHooksEvents/" />
   </ItemGroup>
 
